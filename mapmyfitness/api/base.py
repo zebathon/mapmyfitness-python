@@ -18,7 +18,7 @@ class BaseAPI(object):
     def __init__(self, api_config):
         self.api_config = api_config
 
-    def call(self, method, path, data=None, extra_headers=None, params=None):
+    def call(self, method, path, data=None, files=None, extra_headers=None, params=None):
         full_path = self.api_config.api_root + path
         headers = {
             'Api-Key': self.api_config.api_key,
@@ -32,6 +32,9 @@ class BaseAPI(object):
         if data is not None:
             kwargs['data'] = json.dumps(data)
 
+        if files is not None:
+            kwargs['files'] = files
+
         if params is not None:
             kwargs['params'] = params
             for param_key, param_val in params.items():
@@ -39,6 +42,7 @@ class BaseAPI(object):
                     kwargs['params'][param_key] = datetime_to_iso_format(param_val)
 
         resp = getattr(requests, method)(full_path, **kwargs)
+        print resp.status_code
 
         if resp.status_code in self.http_exception_map:
             bad_request_json = resp.json()

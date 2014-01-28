@@ -44,14 +44,18 @@ class Createable(object):
 
 
 class Updateable(object):
-    def update(self, id, obj):
-        self.validator = self.validator_class(obj)
-        if not self.validator.valid:
-            raise InvalidObjectException(self.validator)
-        inflator = self.inflator_class(obj)
-        data = inflator.inflated
+    def update(self, id, obj=None, files=None, content_type='application/json'):
+        if obj:
+            self.validator = self.validator_class(obj)
+            if not self.validator.valid:
+                raise InvalidObjectException(self.validator)
+            inflator = self.inflator_class(obj)
+            data = inflator.inflated
 
-        api_resp = self.call('put', '{0}/{1}/'.format(self.path, id), data=data, extra_headers={'Content-Type': 'application/json'})
+            api_resp = self.call('put', '{0}/{1}/'.format(self.path, id), data=data, extra_headers={'Content-Type': content_type})
+        elif files:
+            api_resp = self.call('put', '{0}/{1}/'.format(self.path, id), files=files, extra_headers={'Content-Type': content_type, 'Accept': content_type})
+
         serializer = self.serializer_class(api_resp)
         return serializer.serialized
 

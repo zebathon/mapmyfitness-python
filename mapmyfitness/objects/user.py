@@ -68,6 +68,12 @@ class UserObject(BaseObject):
         user_profile_photo = instance._user_profile_photo.find(self.id)
         return getattr(user_profile_photo, size)
 
+    def update_profile_photo(self, binary, type='image/jpeg'):
+        from mapmyfitness import MapMyFitness
+        instance = MapMyFitness.instance()
+        files = {'file': binary}
+        instance._user_profile_photo.update(self.id, files=files, content_type=type)
+
 
 class UserProfilePhotoObject(BaseObject):
     @property

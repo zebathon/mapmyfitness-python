@@ -1,7 +1,7 @@
 from .base import BaseAPI
 from ..validators.user import UserValidator
 from ..serializers import UserSerializer, UserProfilePhotoSerializer
-from .mixins import Searchable, Findable
+from .mixins import Searchable, Findable, Updateable
 
 
 class User(BaseAPI, Searchable, Findable):
@@ -11,6 +11,6 @@ class User(BaseAPI, Searchable, Findable):
     embedded_name = 'user'
 
 
-class UserProfilePhoto(BaseAPI, Findable):
+class UserProfilePhoto(BaseAPI, Findable, Updateable):
     path = '/user_profile_photo'
     serializer_class = UserProfilePhotoSerializer
