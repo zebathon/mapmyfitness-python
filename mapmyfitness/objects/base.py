@@ -18,3 +18,10 @@ class BaseObject(object):
                     if property_name is None:
                         property_name = property_key
                     setattr(self, property_name, iso_format_to_datetime(self.original_dict[property_key]))
+
+    @property
+    def _instance(self):
+        if not hasattr(self, '_instance_'):
+            from mapmyfitness import MapMyFitness
+            self._instance_ = MapMyFitness.instance()
+        return self._instance_

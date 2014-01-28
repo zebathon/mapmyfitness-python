@@ -1,5 +1,4 @@
 import datetime
-import inspect
 
 from .base import BaseObject
 from ..exceptions import AttributeNotFoundException, InvalidSizeException
@@ -17,13 +16,6 @@ class UserObject(BaseObject):
     }
 
     _good_attrs = ('time_zone', 'location')
-
-    @property
-    def _instance(self):
-        if not hasattr(self, '_instance_'):
-            from mapmyfitness import MapMyFitness
-            self._instance_ = MapMyFitness.instance()
-        return self._instance_
 
     def __getattr__(self, name):
         # First checking to see if requested attr is in the list

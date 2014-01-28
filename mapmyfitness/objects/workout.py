@@ -24,9 +24,7 @@ class WorkoutObject(BaseObject):
             elif hasattr(self, '_time_series'):
                 return self._time_series
             else:
-                from mapmyfitness import MapMyFitness
-                instance = MapMyFitness.instance()
-                workout = instance.workout.find(self.id)
+                workout = self._instance.workout.find(self.id)
                 self._time_series = workout.time_series
                 return self._time_series
 
@@ -72,9 +70,7 @@ class WorkoutObject(BaseObject):
             if hasattr(self, '_route'):
                 return self._route
             else:
-                from mapmyfitness import MapMyFitness
-                instance = MapMyFitness.instance()
-                route = instance.route.find(self.route_id)
+                route = self._instance.route.find(self.route_id)
                 self._route = route
                 return self._route
 
