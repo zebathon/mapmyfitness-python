@@ -131,6 +131,7 @@ class UserTest(MapMyFitnessTestCase):
         users = self.mmf.user.search(friends_with=9118466)
         user = users[0]
         self.assertEqual(user.location['locality'], 'Austin')
+        self.assertEqual(user.gender, 'M')
         self.assertRaises(AttributeNotFoundException, lambda: user.shoe_size)
 
     def test_serializer(self):

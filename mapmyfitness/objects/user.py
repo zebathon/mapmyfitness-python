@@ -16,16 +16,22 @@ class UserObject(BaseObject):
         'date_joined': 'join_datetime',
     }
 
+    _good_attrs = ('time_zone', 'location')
+
+    @property
+    def _instance(self):
+        if not hasattr(self, '_instance_'):
+            from mapmyfitness import MapMyFitness
+            self._instance_ = MapMyFitness.instance()
+        return self._instance_
+
     def __getattr__(self, name):
-        # First checking to see if we're entering a recursion
-        # cycle, and if so exiting immediately. Calling `hasattr(self, name)`
-        # will call getattr(self, name) itself and therefore keep recursing.
-        if '__getattr__' in inspect.stack()[1]:
+        # First checking to see if requested attr is in the list
+        # of known good attrs
+        if name not in self._good_attrs:
             raise AttributeNotFoundException
 
-        from mapmyfitness import MapMyFitness
-        instance = MapMyFitness.instance()
-        user = instance.user.find(self.id)
+        user = self._instance.user.find(self.id)
         self.__init__(user.original_dict)
 
         return getattr(self, name)
@@ -63,9 +69,7 @@ class UserObject(BaseObject):
     def get_profile_photo(self, size='medium'):
         if size not in ('small', 'medium', 'large'):
             raise InvalidSizeException('User get_profile_photo size must one of "small", "medium" or "large".')
-        from mapmyfitness import MapMyFitness
-        instance = MapMyFitness.instance()
-        user_profile_photo = instance._user_profile_photo.find(self.id)
+        user_profile_photo = self._instance._user_profile_photo.find(self.id)
         return getattr(user_profile_photo, size)
 
 
