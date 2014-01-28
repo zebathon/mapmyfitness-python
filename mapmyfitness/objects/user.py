@@ -15,7 +15,7 @@ class UserObject(BaseObject):
         'date_joined': 'join_datetime',
     }
 
-    _good_attrs = ('time_zone', 'location')
+    _good_attrs = ('time_zone', 'location', '_instance_',)
 
     def __getattr__(self, name):
         # First checking to see if requested attr is in the list
