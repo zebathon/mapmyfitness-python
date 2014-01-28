@@ -1,3 +1,4 @@
+import inspect
 import datetime
 
 from .base import BaseObject
@@ -21,6 +22,12 @@ class UserObject(BaseObject):
         # First checking to see if requested attr is in the list
         # of known good attrs
         if name not in self._good_attrs:
+            raise AttributeNotFoundException
+
+        # First checking to see if we're entering a recursion
+        # cycle, and if so exiting immediately. Calling `hasattr(self, name)`
+        # will call getattr(self, name) itself and therefore keep recursing.
+        if '__getattr__' in inspect.stack()[1]:
             raise AttributeNotFoundException
 
         user = self._instance.user.find(self.id)
