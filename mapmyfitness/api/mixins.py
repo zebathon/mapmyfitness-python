@@ -1,3 +1,6 @@
+import time
+from locust import events
+
 from mapmyfitness.exceptions import InvalidSearchArgumentsException, InvalidObjectException
 
 
@@ -14,7 +17,12 @@ class Searchable(object):
         if self.__class__.__name__ == 'Route':
             # Routes are special, and need to be requested with additional params
             kwargs.update({'field_set': 'detailed'})
-        api_resp = self.call('get', self.path + '/', params=kwargs)
+
+        if kwargs.get('time_it'):
+            kwargs.pop('time_it')
+            api_resp = _timed_call(self, 'get', self.path + '/', params=kwargs)
+        else:
+            api_resp = self.call('get', self.path + '/', params=kwargs)
 
         objs = []
         for obj in api_resp['_embedded'][self.embedded_name]:
@@ -57,11 +65,22 @@ class Updateable(object):
 
 
 class Findable(object):
-    def find(self, id):
-        params = None
+    def find(self, id, **kwargs):
         if self.__class__.__name__ == 'Route':
             # Routes are special, and need to be requested with additional params
-            params = {'field_set': 'detailed'}
-        api_resp = self.call('get', '{0}/{1}'.format(self.path, id), params=params)
+            kwargs.update({'field_set': 'detailed'})
+        if kwargs.get('time_it'):
+            kwargs.pop('time_it')
+            api_resp = _timed_call(self, 'get', '{0}/{1}'.format(self.path, id), params=kwargs)
+        else:
+            api_resp = self.call('get', '{0}/{1}'.format(self.path, id), params=kwargs)
         serializer = self.serializer_class(api_resp)
         return serializer.serialized
+
+def _timed_call(obj, call_type, call_string, **params):
+    start_time = time.time()
+    api_resp = obj.call(call_type, call_string, params=params)
+    total_time = int((time.time() - start_time) * 1000)
+    events.request_success.fire(request_type=obj.__name__, name=call_string, response_time=total_time,
+                                response_length=len(api_resp))
+    return api_resp

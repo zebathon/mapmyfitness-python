@@ -48,3 +48,8 @@ class WorkoutInflator(BaseInflator):
                 inflated['aggregates'][aggregate_value] = inflated[aggregate_value]
 
         self.inflated = inflated
+
+class OverallLeaderboardEntryInflator(BaseInflator):
+    def inflate(self):
+        inflated = copy.deepcopy(self.initial_obj)
+        self.inflated = inflated
